@@ -64,5 +64,5 @@ The same works with `--destination-path` except the write will start at the path
 | destination url       | --destination-url, -du        |  --source-url  |           |                                | FQDN of vault url with port where kvs are written to. default is --source-url  |
 | destination token     | --destination-token, -dt      | --source-token |           |                                | token used for write authorization in source vault. default is --source-token  |
 | destination namespace | --destination-namespace, -dns |                |           |                                | namespace to write kvs. leave empty if kv mount is in root                     |
-| destination mount     | --destination-mount, -dm      |                |           |                                | name of the kv mount to write to. default is same as --source-mount            |
+| destination mount     | --destination-mount, -dm      |     secret     |           |                                | name of the kv mount to write to. default is same as --source-mount            |
 | kv version            | --kv-version, -kvv            |        1       |           |                                | which kv version secrets are stored as. will be written using same version     |
