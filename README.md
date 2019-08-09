@@ -1,7 +1,32 @@
-# vault_kv_recursive
+# kv_recursive
 a command line tool to interact with Hashicorp Vault kv engine recursively
 
-Arguments:
+## Actions Implemented
+
+Currently, only copy is supported via the command-line tool
+
+## Execution Examples
+
+Example of copying the root secret/ kv mount secrets to a namespace "teama"
+```
+python kv_recursive.py copy \
+--tls-skip-verify \
+--source-url "https://127.0.0.1:8200" \
+--source-token "<redacted>" \
+--destination-namespace "teama"
+```
+
+Starting from a non-root path
+```
+python kv_recursive.py copy \
+--tls-skip-verify \
+-su "https://127.0.0.1:8200" \
+-st "<redacted>" \
+-d "drew" \
+-dns "teama"
+```
+
+## Arguments:
 
 | name                  | syntax                        |     default    | required? | choices                        | desc.                                                                          |
 |-----------------------|-------------------------------|:--------------:|:---------:|--------------------------------|--------------------------------------------------------------------------------|
