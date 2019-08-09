@@ -3,9 +3,11 @@ a command line tool to interact with Hashicorp Vault kv engine recursively
 
 ## Actions Implemented
 
-These actions are currently imlemented: `copy`, `list`, and `read`
-
-Not implemented yet: `move`, `delete`
+- `list`
+- `read`
+- `copy`
+- `move`
+- `delete`
 
 ## Execution Examples
 
@@ -18,22 +20,35 @@ python kv_recursive.py copy \
 --destination-namespace "teama"
 ```
 
-Starting from a non-root path
-```
-python kv_recursive.py copy \
---tls-skip-verify \
--su "https://127.0.0.1:8200" \
--st "<redacted>" \
--d "drew" \
--dns "teama"
-```
-
 List secrets
 ```
 python kv_recursive.py read --tls-skip-verify \
 -su "https://127.0.0.1:8200" \
 -st "<redacted>" 
 ```
+## What are the "path" arguments?
+
+This code allows you to define a subset of your kv mount via pathing. so you can specify not only the kv mount but a subset of secrets in that mount and only interact with those.
+
+```
+vault list -ns=kvs secret/
+Keys
+----
+drew/
+frew
+```
+
+For example, i can run a copy and pass the `--source-path "drew"` and it will start the recursion search at `drew/*`; `frew` will be ignored!
+
+```
+python kv_recursive.py copy \
+--tls-skip-verify \
+-su "https://127.0.0.1:8200" \
+-st "<redacted>" \
+--source-path "drew" 
+```
+
+The same works with `--destination-path` except the write will start at the path you provie.
 
 ## Arguments:
 
