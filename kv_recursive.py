@@ -9,8 +9,6 @@
 # migrate_recursive: provide a client and the root portion of secrets path, and receive a list of all secrets in that path and their kvs
 # delete_recursive: provide a list of secrets to delete
 
-# TODO: path param currently must end in /
-
 import hvac
 import requests, urllib3
 import sys, getopt
@@ -145,6 +143,13 @@ if __name__ == '__main__':
         args.destination_url = args.source_url
     if not args.destination_token:
         args.destination_token = args.source_token
+
+    if args.destination_path != '':
+        if args.destination_path[-1] != '/':
+            args.destination_path += '/'
+    if args.source_path != '':
+        if args.source_path[-1] != '/':
+            args.source_path += '/'
 
     source_client = hvac.Client(url=args.source_url, token=args.source_token, verify=args.tls_skip_verify, namespace=args.source_namespace )
     destination_client = hvac.Client(url=args.destination_url, token=args.destination_token, verify=args.tls_skip_verify, namespace=args.destination_namespace )
