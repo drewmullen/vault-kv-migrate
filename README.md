@@ -59,7 +59,7 @@ The same works with `--destination-path` except the write will start at the path
 | source path           | --source-path, -s             |       ''       |     *     |                                | kv path to use as root for recursion lookup                                    |
 | source url            | --source-url, -su             |                |     *     |                                | FQDN of vault url with port where kvs are sourced from                         |
 | source token          | --source-token, -st           |                |     *     |                                | token used for read authorization in source vault                              |
-| source namespace      | --source-namespace, -sns      |       ''       |     *     |                                | namespace where kv resides. leave empty if kv mount is in root                 |
+| source namespace      | --source-namespace, -sns      |       ''       |           |                                | namespace where kv resides. leave empty if kv mount is in root                 |
 | source mount          | --source-mount, -sm           |     secret     |           |                                | name of the kv mount to read from                                              |
 | destination path      | --destination-path, -d        |  --source-path |           |                                | kv path to use as root for recursion write. defaults to same as --source-path. |
 | destination url       | --destination-url, -du        |  --source-url  |           |                                | FQDN of vault url with port where kvs are written to. default is --source-url  |
