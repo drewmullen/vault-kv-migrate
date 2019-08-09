@@ -10,7 +10,6 @@
 # delete_recursive: provide a list of secrets to delete
 
 # TODO: delete_recursive currently expects the kv_list to also contain secret key/values, this should be removed. a list of secrets should be fine
-# TODO: verify ssl support
 # TODO: accept parameters to work as a command
 # TODO: provide action wrappers ('copy', 'move', 'delete')
 # TODO: path param currently must end in /
