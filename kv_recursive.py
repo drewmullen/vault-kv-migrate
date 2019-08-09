@@ -152,4 +152,6 @@ if __name__ == '__main__':
     destination_client = hvac.Client(url=args.destination_url, token=args.destination_token, verify=args.tls_skip_verify, namespace=args.destination_namespace )
     if args.action == 'copy':
         migrate_secrets(source_client, destination_client, args.source_path, args.source_mount, args.destination_mount, args.destination_path, kv_version=args.kv_version)
+    elif args.action == 'list':
+        print(list_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
 
