@@ -125,7 +125,7 @@ def main():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Recursively interact with Hashicorp Vault KV mount')
-    parser.add_argument('action', choices=['copy','move','delete', 'list'], default='copy', metavar='ACTION')
+    parser.add_argument('action', choices=['copy','move','delete', 'list', 'read'], default='list', metavar='ACTION')
     parser.add_argument('--tls-skip-verify', action='store_false')
     parser.add_argument('--source-path', '-s', default='')
     parser.add_argument('--source-url', '-su', required=True)
@@ -154,4 +154,6 @@ if __name__ == '__main__':
         migrate_secrets(source_client, destination_client, args.source_path, args.source_mount, args.destination_mount, args.destination_path, kv_version=args.kv_version)
     elif args.action == 'list':
         print(list_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+    elif args.action == 'read':
+        print(read_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
 
