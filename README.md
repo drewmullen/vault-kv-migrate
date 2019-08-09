@@ -1,4 +1,4 @@
-# kv_recursive
+# Hashicorp Vault KV Resursive Tool
 a command line tool to interact with Hashicorp Vault kv engine recursively
 
 ## Actions Implemented
