@@ -9,9 +9,6 @@
 # migrate_recursive: provide a client and the root portion of secrets path, and receive a list of all secrets in that path and their kvs
 # delete_recursive: provide a list of secrets to delete
 
-# TODO: delete_recursive currently expects the kv_list to also contain secret key/values, this should be removed. a list of secrets should be fine
-# TODO: accept parameters to work as a command
-# TODO: provide action wrappers ('copy', 'move', 'delete')
 # TODO: path param currently must end in /
 
 import hvac
@@ -31,10 +28,9 @@ def list_recursive(client, path, kv_version, source_mount):
     return kv_list
 
 
-def delete_recursive(client, path):
-    kv_list = list_recursive(client, path)
-    kv_list = read_secrets_from_list(client, kv_list)
-    delete_secrets_from_list(client, kv_list)
+def delete_recursive(client, path, kv_version, source_mount):
+    kv_list = list_recursive(client, path, kv_version, source_mount)
+    delete_secrets_from_list(client, kv_list, kv_version, source_mount)
 
 
 def read_recursive(client, path, kv_version, source_mount):
@@ -49,7 +45,7 @@ def migrate_secrets(src_client, dest_client, src_path, source_mount, dest_mount,
             dest_path += '/'
     kv_list = read_recursive(src_client, src_path, kv_version, source_mount)
     write_secrets_from_list(dest_client, kv_list, dest_path, src_path, kv_version, dest_mount)
-    print("Secrets moved: ", len(kv_list))
+    print("Secrets copied: ", len(kv_list))
 
 
 # Construction Methods
@@ -104,10 +100,12 @@ def write_secrets_from_list(client, kv_list, dest_path, src_path, kv_version, de
 
 
 # this expects the secret to be in the json blob - need to fix
-def delete_secrets_from_list(client, kv_list):
+def delete_secrets_from_list(client, kv_list, kv_version, source_mount):
     for li in kv_list:
-        sname= str(li.keys()[0])
-        client.secrets.kv.v2.delete_metadata_and_all_versions(path=sname)
+        if kv_version == 2:
+            client.secrets.kv.v2.delete_metadata_and_all_versions(path=li, mount_point=source_mount)
+        if kv_version == 1:
+            client.secrets.kv.v1.delete_secret(path=li, mount_point=source_mount)
 
 
 def main():
@@ -156,4 +154,10 @@ if __name__ == '__main__':
         print(list_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
     elif args.action == 'read':
         print(read_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+    elif args.action == 'delete':
+        print(delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+    elif args.action == 'move':
+        migrate_secrets(source_client, destination_client, args.source_path, args.source_mount, args.destination_mount, args.destination_path, kv_version=args.kv_version)
+        print(delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+
 
