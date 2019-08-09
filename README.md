@@ -28,6 +28,13 @@ python kv_recursive.py copy \
 -dns "teama"
 ```
 
+List secrets
+```
+python kv_recursive.py read --tls-skip-verify \
+-su "https://127.0.0.1:8200" \
+-st "<redacted>" 
+```
+
 ## Arguments:
 
 | name                  | syntax                        |     default    | required? | choices                        | desc.                                                                          |
