@@ -30,7 +30,7 @@ python kv_recursive.py copy \
 
 | name                  | syntax                        |     default    | required? | choices                        | desc.                                                                          |
 |-----------------------|-------------------------------|:--------------:|:---------:|--------------------------------|--------------------------------------------------------------------------------|
-| action                |                               |      copy      |     *     | copy, move, delete, list, read | action to perform                                                              |
+| action                |                               |      list      |     *     | copy, move, delete, list, read | action to perform                                                              |
 | skip tls verification | --tls-skip-verify             |                |           |                                |                                                                                |
 | source path           | --source-path, -s             |       ''       |     *     |                                | kv path to use as root for recursion lookup                                    |
 | source url            | --source-url, -su             |                |     *     |                                | FQDN of vault url with port where kvs are sourced from                         |
