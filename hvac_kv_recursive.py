@@ -13,12 +13,12 @@
 # TODO: verify ssl support
 # TODO: accept parameters to work as a command
 # TODO: provide action wrappers ('copy', 'move', 'delete')
+# TODO: path param currently must end in /
 
 import hvac
-import requests
-import urllib3
-import ast
-import json
+import requests, urllib3
+import sys, getopt
+import argparse
 
 requests = requests.Session()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -44,7 +44,7 @@ def read_recursive(client, path, kv_version):
     return secrets_list
 
 
-def migrate_secrets(src_client, dest_client, src_path, dest_path='', kv_version=2):
+def migrate_secrets(src_client, dest_client, src_path, dest_path='', kv_version=1):
     if dest_path != '':
         if dest_path[-1] != '/':
             dest_path += '/'
@@ -112,15 +112,45 @@ def delete_secrets_from_list(client, kv_list):
 
 
 def main():
+    pass
     #example run vars
-    path = ''
-    path2 = 'nested/'
-    client = hvac.Client(url='https://127.0.0.1:8200', token='<redacted>', verify=False)#, namespace="ns1")
-    client2 = hvac.Client(url='https://127.0.0.1:8200', token='<redacted>', verify=False)#, namespace="kv1")
+    # path = 'drew/' #must end in / 
+    # path2 = 'nested/'
+    # client = hvac.Client(url='https://127.0.0.1:8200', token='<redacted>', verify=False, namespace="ns1")
+    # client2 = hvac.Client(url='https://127.0.0.1:8200', token='<redacted>', verify=False, namespace="kv1")
 
-    #client = hvac.Client(url='https://vault.example.com', token='abc123', verify=False, namespace='namespace/child_namespace/sub_child_namespace')
-    migrate_secrets(client, client2, path, path2, kv_version=1)
+    # #client = hvac.Client(url='https://vault.example.com', token='abc123', verify=False, namespace='namespace/child_namespace/sub_child_namespace')
+    # migrate_secrets(client, client2, path, path2, kv_version=1)
 
 
 if __name__ == '__main__':
-    main()
+
+    parser = argparse.ArgumentParser(description='Recursively interact with Hashicorp Vault KV mount')
+    parser.add_argument('action', choices=['copy','move','delete', 'list'], default='copy', metavar='ACTION')
+    parser.add_argument('--tls-skip-verify', action='store_false')
+    parser.add_argument('--source-path', '-s', default='')
+    parser.add_argument('--source-url', '-su', required=True)
+    parser.add_argument('--source-token', '-st', required=True)
+    parser.add_argument('--source-namespace', '-sns', default='')
+    parser.add_argument('--source-mount', '-sm', default='secret')
+    parser.add_argument('--destination-path', '-d')
+    parser.add_argument('--destination-url', '-du')
+    parser.add_argument('--destination-token', '-dt')
+    parser.add_argument('--destination-namespace', '-dns', default='')
+    parser.add_argument('--kv-version', '-kvv', type=int, default=1)
+    parser.add_argument('--destination-mount', '-dm', default='secret')
+
+    args = parser.parse_args()
+
+    if not args.destination_path:
+        args.destination_path = args.source_path
+    if not args.destination_url:
+        args.destination_url = args.source_url
+    if not args.destination_token:
+        args.destination_token = args.source_token
+
+    source_client = hvac.Client(url=args.source_url, token=args.source_token, verify=args.tls_skip_verify, namespace=args.source_namespace )
+    destination_client = hvac.Client(url=args.destination_url, token=args.destination_token, verify=args.tls_skip_verify, namespace=args.destination_namespace )
+    if args.action == 'copy':
+        migrate_secrets(source_client, destination_client, args.source_path, args.destination_path, kv_version=args.kv_version)
+
