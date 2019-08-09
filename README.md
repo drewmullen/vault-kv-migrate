@@ -3,7 +3,9 @@ a command line tool to interact with Hashicorp Vault kv engine recursively
 
 ## Actions Implemented
 
-Currently, only copy is supported via the command-line tool
+These actions are currently imlemented: `copy`, `list`, and `read`
+
+Not implemented yet: `move`, `delete`
 
 ## Execution Examples
 
