@@ -24,10 +24,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ## Wrapper methods
 
-def list_recursive(client, path, kv_version):
+def list_recursive(client, path, kv_version, source_mount):
     kv_list = []
-    kv_list = list_path(client, path, kv_version, kv_list)
-    kv_list = recursive_path_builder(client, kv_list, kv_version)
+    kv_list = list_path(client, path, kv_version, source_mount, kv_list)
+    kv_list = recursive_path_builder(client, kv_list, kv_version, source_mount)
     return kv_list
 
 
@@ -37,44 +37,44 @@ def delete_recursive(client, path):
     delete_secrets_from_list(client, kv_list)
 
 
-def read_recursive(client, path, kv_version):
-    kv_list = list_recursive(client, path, kv_version)
+def read_recursive(client, path, kv_version, source_mount):
+    kv_list = list_recursive(client, path, kv_version, source_mount)
     secrets_list = read_secrets_from_list(client, kv_list, kv_version)
     return secrets_list
 
 
-def migrate_secrets(src_client, dest_client, src_path, dest_path='', kv_version=1):
+def migrate_secrets(src_client, dest_client, src_path, source_mount, dest_mount, dest_path='', kv_version=1):
     if dest_path != '':
         if dest_path[-1] != '/':
             dest_path += '/'
-    kv_list = read_recursive(src_client, src_path, kv_version)
-    write_secrets_from_list(dest_client, kv_list, dest_path, src_path, kv_version)
+    kv_list = read_recursive(src_client, src_path, kv_version, source_mount)
+    write_secrets_from_list(dest_client, kv_list, dest_path, src_path, kv_version, dest_mount)
     print("Secrets moved: ", len(kv_list))
 
 
 # Construction Methods
 
-def recursive_path_builder(client, kv_list, kv_version):
+def recursive_path_builder(client, kv_list, kv_version, source_mount):
     change = 0
     # if any list items end in '/' return 1
     for li in kv_list[:]:
         if li[-1] == '/':
-            list_path(client, li, kv_version, kv_list)
+            list_path(client, li, kv_version, source_mount, kv_list)
             # remove list item ending in '/'
             kv_list.remove(li)
             change = 1
     # new list items added, rerun search
     if change == 1:
-        recursive_path_builder(client, kv_list, kv_version)
+        recursive_path_builder(client, kv_list, kv_version, source_mount)
 
     return kv_list
 
 
-def list_path(client, path, kv_version, kv_list=[]):
+def list_path(client, path, kv_version, source_mount, kv_list=[]):
     if kv_version == 2:
-        l = client.secrets.kv.v2.list_secrets(path, mount_point='secret')['data']['keys']
+        l = client.secrets.kv.v2.list_secrets(path, mount_point=source_mount)['data']['keys']
     elif kv_version == 1:
-        l = client.secrets.kv.v1.list_secrets(path, mount_point='secret')['data']['keys']
+        l = client.secrets.kv.v1.list_secrets(path, mount_point=source_mount)['data']['keys']
     for li in l:
         kv_list.append(path  + li)
     return kv_list
@@ -92,15 +92,15 @@ def read_secrets_from_list(client, kv_list, kv_version):
     return kv_list
 
 
-def write_secrets_from_list(client, kv_list, dest_path, src_path, kv_version):
+def write_secrets_from_list(client, kv_list, dest_path, src_path, kv_version, dest_mount):
     for li in kv_list:
         sname = list(li)[0]
         short_name = sname.replace(src_path, '')
 
         if kv_version == 2:
-            client.secrets.kv.v2.create_or_update_secret(path=(dest_path + short_name), secret=li[sname])
+            client.secrets.kv.v2.create_or_update_secret(path=(dest_path + short_name), secret=li[sname], mount_point=dest_mount)
         elif kv_version == 1:
-            client.secrets.kv.v1.create_or_update_secret(path=(dest_path + short_name), secret=li[sname])
+            client.secrets.kv.v1.create_or_update_secret(path=(dest_path + short_name), secret=li[sname], mount_point=dest_mount)
 
 
 # this expects the secret to be in the json blob - need to fix
@@ -151,5 +151,5 @@ if __name__ == '__main__':
     source_client = hvac.Client(url=args.source_url, token=args.source_token, verify=args.tls_skip_verify, namespace=args.source_namespace )
     destination_client = hvac.Client(url=args.destination_url, token=args.destination_token, verify=args.tls_skip_verify, namespace=args.destination_namespace )
     if args.action == 'copy':
-        migrate_secrets(source_client, destination_client, args.source_path, args.destination_path, kv_version=args.kv_version)
+        migrate_secrets(source_client, destination_client, args.source_path, args.source_mount, args.destination_mount, args.destination_path, kv_version=args.kv_version)
 
