@@ -33,7 +33,7 @@ def delete_recursive(client, path, kv_version, source_mount):
 
 def read_recursive(client, path, kv_version, source_mount):
     kv_list = list_recursive(client, path, kv_version, source_mount)
-    secrets_list = read_secrets_from_list(client, kv_list, kv_version)
+    secrets_list = read_secrets_from_list(client, kv_list, kv_version, source_mount)
     return secrets_list
 
 
@@ -74,13 +74,13 @@ def list_path(client, path, kv_version, source_mount, kv_list=[]):
     return kv_list
 
 
-def read_secrets_from_list(client, kv_list, kv_version):
+def read_secrets_from_list(client, kv_list, kv_version, source_mount):
     for i, li in enumerate(kv_list[:]):
         k = kv_list[i]
         if kv_version == 2:
-            v = client.secrets.kv.v2.read_secret_version(k, mount_point='secret')['data']['data']
+            v = client.secrets.kv.v2.read_secret_version(k, mount_point=source_mount)['data']['data']
         elif kv_version == 1:
-            v = client.secrets.kv.v1.read_secret(k, mount_point='secret')['data']
+            v = client.secrets.kv.v1.read_secret(k, mount_point=source_mount)['data']
         kv_list[i] = {k:v}
 
     return kv_list
