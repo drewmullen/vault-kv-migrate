@@ -38,9 +38,6 @@ def read_recursive(client, path, kv_version, source_mount):
 
 
 def migrate_secrets(src_client, dest_client, src_path, source_mount, dest_mount, dest_path='', kv_version=1):
-    if dest_path != '':
-        if dest_path[-1] != '/':
-            dest_path += '/'
     kv_list = read_recursive(src_client, src_path, kv_version, source_mount)
     write_secrets_from_list(dest_client, kv_list, dest_path, src_path, kv_version, dest_mount)
     print("Secrets copied: ", len(kv_list))
@@ -105,6 +102,12 @@ def delete_secrets_from_list(client, kv_list, kv_version, source_mount):
         if kv_version == 1:
             client.secrets.kv.v1.delete_secret(path=li, mount_point=source_mount)
 
+def ensure_trailing_slash(s):
+    if s != '':
+        if s[-1] != '/':
+            s += '/'
+    return s
+
 
 def main():
     pass
@@ -132,7 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('--destination-url', '-du')
     parser.add_argument('--destination-token', '-dt')
     parser.add_argument('--destination-namespace', '-dns', default='')
-    parser.add_argument('--kv-version', '-kvv', type=int, default=1)
+    parser.add_argument('--kv-version', '-kvv', type=int, default=1, choices=[1,2])
     parser.add_argument('--destination-mount', '-dm', default='secret')
 
     args = parser.parse_args()
@@ -144,12 +147,15 @@ if __name__ == '__main__':
     if not args.destination_token:
         args.destination_token = args.source_token
 
-    if args.destination_path != '':
-        if args.destination_path[-1] != '/':
-            args.destination_path += '/'
-    if args.source_path != '':
-        if args.source_path[-1] != '/':
-            args.source_path += '/'
+    args.destination_path = ensure_trailing_slash(args.destination_path)
+    args.source_path = ensure_trailing_slash(args.source_path)
+
+    # if args.destination_path != '':
+    #     if args.destination_path[-1] != '/':
+    #         args.destination_path += '/'
+    # if args.source_path != '':
+    #     if args.source_path[-1] != '/':
+    #         args.source_path += '/'
 
     source_client = hvac.Client(url=args.source_url, token=args.source_token, verify=args.tls_skip_verify, namespace=args.source_namespace )
     destination_client = hvac.Client(url=args.destination_url, token=args.destination_token, verify=args.tls_skip_verify, namespace=args.destination_namespace )
