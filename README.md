@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/drewmullen/vault-kv-migrate.svg?style=svg)](https://circleci.com/gh/drewmullen/vault-kv-migrate)
+
 # Hashicorp Vault KV Resursive Tool
 a command line tool to interact with Hashicorp Vault kv engine recursively
 
