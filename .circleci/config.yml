@@ -2,12 +2,11 @@ version: 2.1
 jobs:
   toxify:
     docker:
-      - image: circleci/python:3.6
+      - image: python:3.6
     steps:
       - checkout
       - run: pip install tox && tox
       - run: curl -s https://codecov.io/bash | bash
-
 workflows:
   version: 2
   kv_recursive_test:
