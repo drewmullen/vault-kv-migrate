@@ -15,6 +15,7 @@ import hvac
 import requests
 import urllib3
 import argparse
+import getopt
 
 requests = requests.Session()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
