@@ -7,8 +7,7 @@ jobs:
     steps:
       - checkout
       - run: pip install tox && tox
-      - run: echo "$CODECOV_TOKEN"
-      - run: pip install codecov && codecov
+      - run: pip install codecov && codecov -t $CODECOV_TOKEN
 
 workflows:
   version: 2
