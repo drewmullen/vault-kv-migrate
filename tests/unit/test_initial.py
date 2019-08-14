@@ -45,13 +45,33 @@ class TestKV(object):
         assert kv_list == ['test', 'test2']
         assert self.hvacclient.secrets.kv.v1.list_secrets.called
 
-    def test_read_secrets(self):
-        kv_list = ['test']
+    def test_read_secrets_v2(self):
         self.hvacclient.secrets.kv.v2.read_secret_version.return_value = {'data': {'data': {"name": "drew"}}}
         secrets = kv_recursive.read_secrets_from_list(
             self.hvacclient,
-            kv_list,
+            kv_list=['test', 'test2'],
             kv_version=2,
             source_mount='secret'
         )
-        assert secrets == [{'test': {'name': 'drew'}}]
+        assert secrets == [{'test': {'name': 'drew'}}, {'test2': {'name': 'drew'}}]
+
+    def test_read_secrets_v1(self):
+        self.hvacclient.secrets.kv.v1.read_secret.return_value = {'data': {"name": "drew"}}
+        secrets = kv_recursive.read_secrets_from_list(
+            self.hvacclient,
+            kv_list=['test', 'test2'],
+            kv_version=1,
+            source_mount='secret'
+        )
+        assert secrets == [{'test': {'name': 'drew'}}, {'test2': {'name': 'drew'}}]
+
+    def test_write_secrets_from_list_v2(self):
+        kv_recursive.write_secrets_from_list(
+            self.hvacclient,
+            kv_list=[{'test': {'name': 'drew'}}],
+            dest_path='',
+            src_path='',
+            kv_version=2,
+            dest_mount='secret'
+        )
+        assert self.hvacclient.secrets.kv.v2.create_or_update_secret.called
