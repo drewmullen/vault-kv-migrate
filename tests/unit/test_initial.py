@@ -19,30 +19,29 @@ class TestKV(object):
 
     # list_path
 
-    # def test_list_path_v2(self):
-    #     self.hvacclient.secrets.kv.v2.list_secrets.return_value = ['test2']
-    #     kv_list = kv_recursive.list_path(
-    #             self.hvacclient,
-    #             path='',
-    #             kv_version=2,
-    #             source_mount='secret',
-    #         )
+    def test_list_path_v2(self):
+        self.hvacclient.secrets.kv.v2.list_secrets.return_value = {'data': {'keys': ['test2']}}
+        kv_list = kv_recursive.list_path(
+                self.hvacclient,
+                path='',
+                kv_version=2,
+                source_mount='secret',
+            )
 
-    #     assert kv_list == ['test', 'test2']
-    #     assert self.hvacclient.secrets.kv.v2.list_secrets.called
+        assert kv_list == ['test2']
+        assert self.hvacclient.secrets.kv.v2.list_secrets.called
 
-    # def test_list_path_v1(self):
-    #     self.hvacclient.secrets.kv.v1.list_secrets.return_value = {'data': {'keys': ['test2']}}
-    #     kv_list = kv_recursive.list_path(
-    #             self.hvacclient,
-    #             path='',
-    #             kv_version=1,
-    #             source_mount='secret',
-    #             kv_list=['test']
-    #         )
+    def test_list_path_v1(self):
+        self.hvacclient.secrets.kv.v1.list_secrets.return_value = {'data': {'keys': ['test2']}}
+        kv_list = kv_recursive.list_path(
+                self.hvacclient,
+                path='',
+                kv_version=1,
+                source_mount='secret'
+            )
 
-    #     assert kv_list == ['test', 'test2']
-    #     assert self.hvacclient.secrets.kv.v1.list_secrets.called
+        assert kv_list == ['test2']
+        assert self.hvacclient.secrets.kv.v1.list_secrets.called
 
     def test_read_secrets(self):
         kv_list = ['test']
