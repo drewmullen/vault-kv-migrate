@@ -104,3 +104,14 @@ class TestKV(object):
             source_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v1.delete_secret.called
+
+    @mock.patch('kv_recursive.list_path')
+    def test_recusive_path_builder_no_lists(self, mock_list_path):
+        kv_recursive.recursive_path_builder(
+            self.hvacclient,
+            kv_list=['test'],
+            kv_version=2,
+            source_mount='secret'
+        )
+
+        assert not mock_list_path.called
