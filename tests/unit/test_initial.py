@@ -75,3 +75,32 @@ class TestKV(object):
             dest_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v2.create_or_update_secret.called
+
+    def test_write_secrets_from_list_v1(self):
+        kv_recursive.write_secrets_from_list(
+            self.hvacclient,
+            kv_list=[{'test': {'name': 'drew'}}],
+            dest_path='',
+            src_path='',
+            kv_version=1,
+            dest_mount='secret'
+        )
+        assert self.hvacclient.secrets.kv.v1.create_or_update_secret.called
+
+    def test_delete_secrets_from_list_v2(self):
+        kv_recursive.delete_secrets_from_list(
+            self.hvacclient,
+            kv_list=['test', 'test2'],
+            kv_version=2,
+            source_mount='secret'
+        )
+        assert self.hvacclient.secrets.kv.v2.delete_metadata_and_all_versions.called
+
+    def test_delete_secrets_from_list_v1(self):
+        kv_recursive.delete_secrets_from_list(
+            self.hvacclient,
+            kv_list=['test', 'test2'],
+            kv_version=1,
+            source_mount='secret'
+        )
+        assert self.hvacclient.secrets.kv.v1.delete_secret.called
