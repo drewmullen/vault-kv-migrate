@@ -43,6 +43,59 @@ class TestKV(object):
         assert kv_list == ['test2']
         assert self.hvacclient.secrets.kv.v1.list_secrets.called
 
+    @mock.patch('kv_recursive.list_path')
+    @mock.patch('kv_recursive.recursive_path_builder')
+    def test_list_recursive(self, mock_recursive_path_builder, mock_list_path):
+        kv_recursive.list_recursive(
+            self.hvacclient,
+            path=['test'],
+            kv_version=2,
+            source_mount='secret'
+        )
+
+        assert mock_list_path.called
+        assert mock_recursive_path_builder.called
+
+    @mock.patch('kv_recursive.list_recursive')
+    @mock.patch('kv_recursive.delete_secrets_from_list')
+    def test_delete_recursive(self, mock_delete_secrets_from_list, mock_list_recursive):
+        kv_recursive.delete_recursive(
+            self.hvacclient,
+            path='',
+            kv_version=1,
+            source_mount='secret'
+        )
+
+        assert mock_delete_secrets_from_list.called
+        assert mock_list_recursive.called
+
+    @mock.patch('kv_recursive.list_recursive')
+    @mock.patch('kv_recursive.read_secrets_from_list')
+    def test_read_recursive(self, mock_read_secrets_from_list, mock_list_recursive):
+        kv_recursive.read_recursive(
+            self.hvacclient,
+            path='',
+            kv_version=1,
+            source_mount='secret'
+        )
+
+        assert mock_read_secrets_from_list.called
+        assert mock_list_recursive.called
+
+    @mock.patch('kv_recursive.read_recursive')
+    @mock.patch('kv_recursive.write_secrets_from_list')
+    def test_migrate_secrets(self, mock_write_secrets_from_list, mock_read_recursive):
+        kv_recursive.migrate_secrets(
+            self.hvacclient,
+            self.hvacclient,
+            src_path='',
+            source_mount='secret',
+            dest_mount='secret'
+        )
+
+        assert mock_read_recursive.called
+        assert mock_write_secrets_from_list.called
+
     def test_read_secrets(self):
         kv_list = ['test']
         self.hvacclient.secrets.kv.v2.read_secret_version.return_value = {'data': {'data': {"name": "drew"}}}
