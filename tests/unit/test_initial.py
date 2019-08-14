@@ -44,3 +44,14 @@ class TestKV(object):
 
         assert kv_list == ['test', 'test2']
         assert self.hvacclient.secrets.kv.v1.list_secrets.called
+
+    def test_read_secrets(self):
+        kv_list = ['test']
+        self.hvacclient.secrets.kv.v2.read_secret_version.return_value = {'data': {'data': {"name": "drew"}}}
+        secrets = kv_recursive.read_secrets_from_list(
+            self.hvacclient,
+            kv_list,
+            kv_version=2,
+            source_mount='secret'
+        )
+        assert secrets == [{'test': {'name': 'drew'}}]
