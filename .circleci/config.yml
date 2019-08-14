@@ -6,7 +6,6 @@ jobs:
     steps:
       - checkout
       - run: pip install tox && tox
-      - run: bash <(curl -s https://codecov.io/bash) -t CODECOV_TOKEN
 workflows:
   version: 2
   kv_recursive_test:
