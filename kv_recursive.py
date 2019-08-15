@@ -23,10 +23,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def list_recursive(client, path, kv_version, source_mount):
-    kv_list = []
-    kv_list = list_path(client, path, kv_version, source_mount, kv_list)
-    kv_list = recursive_path_builder(client, kv_list, kv_version, source_mount)
-    return kv_list
+    seed_list = list_path(client, path, kv_version, source_mount)
+    for i, li in enumerate(seed_list):
+        seed_list[i] = (path + li)
+    final_list = recursive_path_builder(client, seed_list, kv_version, source_mount)
+    return final_list
 
 
 def delete_recursive(client, path, kv_version, source_mount):
@@ -53,7 +54,9 @@ def recursive_path_builder(client, kv_list, kv_version, source_mount):
     # if any list items end in '/' return 1
     for li in kv_list[:]:
         if li[-1] == '/':
-            list_path(client, li, kv_version, source_mount, kv_list)
+            append_list = list_path(client, li, kv_version, source_mount)
+            for new_item in append_list:
+                kv_list.append(li + new_item)
             # remove list item ending in '/'
             kv_list.remove(li)
             change = 1
@@ -64,14 +67,11 @@ def recursive_path_builder(client, kv_list, kv_version, source_mount):
     return kv_list
 
 
-def list_path(client, path, kv_version, source_mount, kv_list=[]):
+def list_path(client, path, kv_version, source_mount):
     if kv_version == 2:
-        append_list = client.secrets.kv.v2.list_secrets(path, mount_point=source_mount)['data']['keys']
+        return client.secrets.kv.v2.list_secrets(path, mount_point=source_mount)['data']['keys']
     elif kv_version == 1:
-        append_list = client.secrets.kv.v1.list_secrets(path, mount_point=source_mount)['data']['keys']
-    for li in append_list:
-        kv_list.append(path + li)
-    return kv_list
+        return client.secrets.kv.v1.list_secrets(path, mount_point=source_mount)['data']['keys']
 
 
 def read_secrets_from_list(client, kv_list, kv_version, source_mount):
@@ -163,13 +163,6 @@ if __name__ == '__main__':
     args.destination_path = ensure_trailing_slash(args.destination_path)
     args.source_path = ensure_trailing_slash(args.source_path)
 
-    # if args.destination_path != '':
-    #     if args.destination_path[-1] != '/':
-    #         args.destination_path += '/'
-    # if args.source_path != '':
-    #     if args.source_path[-1] != '/':
-    #         args.source_path += '/'
-
     source_client = hvac.Client(
             url=args.source_url,
             token=args.source_token,
@@ -197,7 +190,7 @@ if __name__ == '__main__':
     elif args.action == 'read':
         print(read_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
     elif args.action == 'delete':
-        print(delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+        delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount)
     elif args.action == 'move':
         migrate_secrets(
             source_client,
@@ -208,4 +201,4 @@ if __name__ == '__main__':
             args.destination_path,
             kv_version=args.kv_version
         )
-        print(delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+        delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount)
