@@ -15,7 +15,8 @@ a command line tool to interact with Hashicorp Vault kv engine recursively
 ## Execution Examples
 
 Example of copying the root secret/ kv mount secrets to a namespace "teama"
-```
+
+```bash
 python kv_recursive.py copy \
 --source-url "https://127.0.0.1:8200" \
 --source-token "<redacted>" \
@@ -23,16 +24,18 @@ python kv_recursive.py copy \
 ```
 
 List secrets
-```
+
+```bash
 python kv_recursive.py read \
 --source-url "https://127.0.0.1:8200" \
---source-token "<redacted>" \
+--source-token "<redacted>"
 ```
+
 ## What are the "path" arguments?
 
 This code allows you to define a subset of your kv mount via pathing. so you can specify not only the kv mount but a subset of secrets in that mount and only interact with those.
 
-```
+```bash
 vault list -ns=kvs secret/
 Keys
 ----
@@ -42,11 +45,11 @@ frew
 
 For example, i can run a copy and pass the `--source-path "drew"` and it will start the recursive search at `drew/*`; `frew` will be ignored!
 
-```
+```bash
 python kv_recursive.py copy \
 --source-url "https://127.0.0.1:8200" \
 --source-token "<redacted>" \
---source-namespace "kvs"
+--source-namespace "kvs" \
 --source-path "drew" 
 ```
 
