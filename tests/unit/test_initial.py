@@ -163,9 +163,10 @@ class TestKV(object):
         mock_list_path.return_value = ['secret']
         secrets = kv_recursive.recursive_path_builder(
             self.hvacclient,
-            kv_list=['test', 'test2/'],
+            kv_list=['test', 'test2/', 'test3/'],
             kv_version=2,
             source_mount='secret'
         )
 
-        assert secrets == ['test', 'test2/secret']
+        assert secrets == ['test', 'test2/secret', 'test3/secret']
+        assert mock_list_path.call_count == 2
