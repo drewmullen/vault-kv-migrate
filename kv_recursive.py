@@ -1,23 +1,10 @@
 #!/usr/bin/python3
 
-# This library provides you with modules to manage secrets recursively. Options include:
-#
-# list, read, migrate, delete
-#
-# list_recursive: provide a client and the root portion of secrets path, and receive a list of all secrets in that path
-# read_recursive: provide a client and the root portion of secrets path, and receive a list of all secrets in that path
-#  and their kvs
-# migrate_recursive: provide a client and the root portion of secrets path, and receive a list of all secrets in that
-#  path and their kvs
-# delete_recursive: provide a list of secrets to delete
-
 import hvac
 import requests
 import urllib3
 import argparse
 
-requests = requests.Session()
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Wrapper methods
 
@@ -159,6 +146,10 @@ if __name__ == '__main__':
         args.destination_url = args.source_url
     if not args.destination_token:
         args.destination_token = args.source_token
+
+    if not args.tls_skip_verify:
+        requests = requests.Session()
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     args.destination_path = ensure_trailing_slash(args.destination_path)
     args.source_path = ensure_trailing_slash(args.source_path)
