@@ -17,15 +17,13 @@ class DisabledCommands(Command):
 with open('README.md') as f:
     readme = f.read()
 
-requirements = [
-    'hvac==0.9.5'
-]
+requirements = [line.strip() for line in open("requirements.txt").readlines()]
 
 # Version here doesnt matter much since we are not
 # installing this outside of our repo or shipping
 # to pypi
 setup(
-    version='0.1.0',
+    version='0.2.0',
     name='vault-kv-migrate',
     description='Sample package for Python-Guide.org',
     long_description=readme,
@@ -34,6 +32,7 @@ setup(
     url='https://github.com/drewmullen/vault-kv-migrate',
     packages=find_packages(exclude=('tests', 'docs')),
     install_requires=requirements,
+
     cmdclass={'register': DisabledCommands,
               'upload': DisabledCommands}
 )
