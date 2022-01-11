@@ -158,13 +158,16 @@ if __name__ == '__main__':
             url=args.source_url,
             token=args.source_token,
             verify=args.tls_skip_verify,
-            namespace=args.source_namespace
+            namespace=args.source_namespace,
+            strict_http=True
+
         )
     destination_client = hvac.Client(
             url=args.destination_url,
             token=args.destination_token,
             verify=args.tls_skip_verify,
-            namespace=args.destination_namespace
+            namespace=args.destination_namespace,
+            strict_http=True
         )
     if args.action == 'copy':
         migrate_secrets(
