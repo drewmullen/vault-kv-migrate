@@ -65,7 +65,7 @@ def read_secrets_from_list(client, kv_list, kv_version, source_mount):
     for i, li in enumerate(kv_list[:]):
         k = kv_list[i]
         if kv_version == 2:
-            v = client.secrets.kv.v2.read_secret_version(k, mount_point=source_mount)['data']['data']
+            v = client.secrets.kv.v2.read_secret_version(k, mount_point=source_mount, raise_on_deleted_version=True)['data']['data']
         elif kv_version == 1:
             v = client.secrets.kv.v1.read_secret(k, mount_point=source_mount)['data']
         kv_list[i] = {k: v}
@@ -124,19 +124,19 @@ def main():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Recursively interact with Hashicorp Vault KV mount')
-    parser.add_argument('action', choices=['copy', 'move', 'delete', 'list', 'read'], default='list', metavar='ACTION')
+    parser.add_argument('action', choices=['copy', 'move', 'delete', 'list', 'read', 'count'], default='list', metavar='ACTION')
     parser.add_argument('--tls-skip-verify', action='store_false')
     parser.add_argument('--source-path', '-s', default='')
     parser.add_argument('--source-url', '-su', required=True)
     parser.add_argument('--source-token', '-st', required=True)
     parser.add_argument('--source-namespace', '-sns', default='')
-    parser.add_argument('--source-mount', '-sm', default='secret')
+    parser.add_argument('--source-mount', '-sm', default='kv-v2')
     parser.add_argument('--destination-path', '-d')
     parser.add_argument('--destination-url', '-du')
     parser.add_argument('--destination-token', '-dt')
     parser.add_argument('--destination-namespace', '-dns', default='')
-    parser.add_argument('--kv-version', '-kvv', type=int, default=1, choices=[1, 2])
-    parser.add_argument('--destination-mount', '-dm', default='secret')
+    parser.add_argument('--kv-version', '-kvv', type=int, default=2, choices=[1, 2])
+    parser.add_argument('--destination-mount', '-dm', default='kv-v2')
 
     args = parser.parse_args()
 
@@ -180,6 +180,8 @@ if __name__ == '__main__':
             )
     elif args.action == 'list':
         print(list_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
+    elif args.action == 'count':
+        print(len(list_recursive(source_client, args.source_path, args.kv_version, args.source_mount)))
     elif args.action == 'read':
         print(read_recursive(source_client, args.source_path, args.kv_version, args.source_mount))
     elif args.action == 'delete':
