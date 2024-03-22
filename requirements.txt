@@ -1,4 +1,4 @@
 hvac==1.2.1
 requests==2.31.0
-urllib3==1.25.3
+urllib3==1.26.18
 argparse==1.4.0
