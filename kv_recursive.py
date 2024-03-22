@@ -65,7 +65,7 @@ def read_secrets_from_list(client, kv_list, kv_version, source_mount):
     for i, li in enumerate(kv_list[:]):
         k = kv_list[i]
         if kv_version == 2:
-            v = client.secrets.kv.v2.read_secret_version(k, mount_point=source_mount, 
+            v = client.secrets.kv.v2.read_secret_version(k, mount_point=source_mount,
                                                          raise_on_deleted_version=True)['data']['data']
         elif kv_version == 1:
             v = client.secrets.kv.v1.read_secret(k, mount_point=source_mount)['data']
@@ -125,7 +125,7 @@ def main():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Recursively interact with Hashicorp Vault KV mount')
-    parser.add_argument('action', choices=['copy', 'move', 'delete', 'list', 'read', 
+    parser.add_argument('action', choices=['copy', 'move', 'delete', 'list', 'read',
                                            'count'], default='list', metavar='ACTION')
     parser.add_argument('--tls-skip-verify', action='store_false')
     parser.add_argument('--source-path', '-s', default='')
