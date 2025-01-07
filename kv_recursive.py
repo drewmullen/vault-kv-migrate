@@ -134,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--destination-mount', '-dm', default='kv-v2')
     args = parser.parse_args()
     logging.debug("Script started with arguments: %s", args)
- 
+
     if not args.destination_path:
         args.destination_path = args.source_path
     if not args.destination_url:
