@@ -113,7 +113,7 @@ class TestKV(object):
             kv_list=[{'test': {'name': 'drew'}}],
             dest_path='',
             src_path='',
-            source_kv_version=2,
+            destination_kv_version=2,
             dest_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v2.create_or_update_secret.called
@@ -124,7 +124,7 @@ class TestKV(object):
             kv_list=[{'test': {'name': 'drew'}}],
             dest_path='',
             src_path='',
-            source_kv_version=1,
+            destination_kv_version=1,
             dest_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v1.create_or_update_secret.called
