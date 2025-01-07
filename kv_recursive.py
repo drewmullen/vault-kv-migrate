@@ -20,7 +20,7 @@ logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(mes
 
 # Wrapper methods
 def list_recursive(client, path, source_kv_version, source_mount):
-    logging.debug(f"Listing secrets recursively at path: {path}, source_kv_version: {kv_version}, mount: {source_mount}")
+    logging.debug(f"Listing secrets recursively at path: {path}, source_kv_version: {source_kv_version}, mount: {source_mount}")
     seed_list = list_path(client, path, source_kv_version, source_mount)
     for i, li in enumerate(seed_list):
         seed_list[i] = (path + li)
@@ -29,7 +29,7 @@ def list_recursive(client, path, source_kv_version, source_mount):
     return final_list
 
 def delete_recursive(client, path, source_kv_version, source_mount):
-    logging.info(f"Deleting secrets recursively from path: {path}, source_kv_version: {kv_version}, mount: {source_mount}")
+    logging.info(f"Deleting secrets recursively from path: {path}, source_kv_version: {source_kv_version}, mount: {source_mount}")
     kv_list = list_recursive(client, path, source_kv_version, source_mount)
     delete_secrets_from_list(client, kv_list, source_kv_version, source_mount)
     logging.info(f"Deleted secrets: {kv_list}")
@@ -49,7 +49,7 @@ def migrate_secrets(src_client, dest_client, src_path, source_mount, dest_mount,
 
 # Construction Methods
 def recursive_path_builder(client, kv_list, source_kv_version, source_mount):
-    logging.debug(f"Building recursive path for source_kv_version: {kv_version}, mount: {source_mount}")
+    logging.debug(f"Building recursive path for source_kv_version: {source_kv_version}, mount: {source_mount}")
     change = 0
     for li in kv_list[:]:
         if li[-1] == '/':
@@ -63,7 +63,7 @@ def recursive_path_builder(client, kv_list, source_kv_version, source_mount):
     return kv_list
 
 def list_path(client, path, source_kv_version, source_mount):
-    logging.debug(f"Listing path: {path}, source_kv_version: {kv_version}, mount: {source_mount}")
+    logging.debug(f"Listing path: {path}, source_kv_version: {source_kv_version}, mount: {source_mount}")
     if source_kv_version == 2:
         return client.secrets.kv.v2.list_secrets(path, mount_point=source_mount)['data']['keys']
     elif source_kv_version == 1:
@@ -100,7 +100,7 @@ def write_secrets_from_list(client, kv_list, dest_path, src_path, destination_kv
     logging.info(f"Secrets written to destination: {len(kv_list)} items.")
 
 def delete_secrets_from_list(client, kv_list, source_kv_version, source_mount):
-    logging.debug(f"Deleting secrets from list for source_kv_version: {kv_version}, mount: {source_mount}")
+    logging.debug(f"Deleting secrets from list for source_kv_version: {source_kv_version}, mount: {source_mount}")
     for li in kv_list:
         if source_kv_version == 2:
             client.secrets.kv.v2.delete_metadata_and_all_versions(path=li, mount_point=source_mount)
@@ -193,4 +193,4 @@ if __name__ == '__main__':
             args.source_kv_version,
             args.destination_kv_version
         )
-        delete_recursive(source_client, args.source_path, args.kv_version, args.source_mount)
+        delete_recursive(source_client, args.source_path, args.source_kv_version, args.source_mount)
