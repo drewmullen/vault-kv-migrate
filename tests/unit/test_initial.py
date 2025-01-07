@@ -24,7 +24,7 @@ class TestKV(object):
         kv_list = kv_recursive.list_path(
                 self.hvacclient,
                 path='',
-                kv_version=2,
+                source_kv_version=2,
                 source_mount='secret',
             )
 
@@ -36,7 +36,7 @@ class TestKV(object):
         kv_list = kv_recursive.list_path(
                 self.hvacclient,
                 path='',
-                kv_version=1,
+                source_kv_version=1,
                 source_mount='secret'
             )
 
@@ -49,7 +49,7 @@ class TestKV(object):
         kv_recursive.list_recursive(
             self.hvacclient,
             path=['test'],
-            kv_version=2,
+            source_kv_version=2,
             source_mount='secret'
         )
 
@@ -62,7 +62,7 @@ class TestKV(object):
         kv_recursive.delete_recursive(
             self.hvacclient,
             path='',
-            kv_version=1,
+            source_kv_version=1,
             source_mount='secret'
         )
 
@@ -75,7 +75,7 @@ class TestKV(object):
         kv_recursive.read_recursive(
             self.hvacclient,
             path='',
-            kv_version=1,
+            source_kv_version=1,
             source_mount='secret'
         )
 
@@ -102,7 +102,7 @@ class TestKV(object):
         secrets = kv_recursive.read_secrets_from_list(
             self.hvacclient,
             kv_list,
-            kv_version=2,
+            source_kv_version=2,
             source_mount='secret'
         )
         assert secrets == [{'test': {'name': 'drew'}}]
@@ -113,7 +113,7 @@ class TestKV(object):
             kv_list=[{'test': {'name': 'drew'}}],
             dest_path='',
             src_path='',
-            kv_version=2,
+            source_kv_version=2,
             dest_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v2.create_or_update_secret.called
@@ -124,7 +124,7 @@ class TestKV(object):
             kv_list=[{'test': {'name': 'drew'}}],
             dest_path='',
             src_path='',
-            kv_version=1,
+            source_kv_version=1,
             dest_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v1.create_or_update_secret.called
@@ -133,7 +133,7 @@ class TestKV(object):
         kv_recursive.delete_secrets_from_list(
             self.hvacclient,
             kv_list=['test', 'test2'],
-            kv_version=2,
+            source_kv_version=2,
             source_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v2.delete_metadata_and_all_versions.called
@@ -142,7 +142,7 @@ class TestKV(object):
         kv_recursive.delete_secrets_from_list(
             self.hvacclient,
             kv_list=['test', 'test2'],
-            kv_version=1,
+            source_kv_version=1,
             source_mount='secret'
         )
         assert self.hvacclient.secrets.kv.v1.delete_secret.called
@@ -152,7 +152,7 @@ class TestKV(object):
         kv_recursive.recursive_path_builder(
             self.hvacclient,
             kv_list=['test'],
-            kv_version=2,
+            source_kv_version=2,
             source_mount='secret'
         )
 
@@ -164,7 +164,7 @@ class TestKV(object):
         secrets = kv_recursive.recursive_path_builder(
             self.hvacclient,
             kv_list=['test', 'test2/', 'test3/'],
-            kv_version=2,
+            source_kv_version=2,
             source_mount='secret'
         )
 
